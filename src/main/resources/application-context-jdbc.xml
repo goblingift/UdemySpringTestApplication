@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+ xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context-4.1.xsd
+    http://www.springframework.org/schema/jdbc
+    http://www.springframework.org/schema/jdbc/spring-jdbc-4.1.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx-4.1.xsd">
+
+    
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+        <property name="url" value="jdbc:hsqldb:mem://localhost" />
+        <property name="username" value="sa" />
+        <property name="password" value="" />
+    </bean>   
+    
+    <jdbc:initialize-database data-source="dataSource">
+        <jdbc:script location="classpath:dbschema.sql" />
+        <jdbc:script location="classpath:test-data.sql" />
+    </jdbc:initialize-database>
+    
+    <bean id="databaseService" class="com.goblingift.orm.DatabaseService">
+        <constructor-arg ref="dataSource" />
+    </bean>
+    
+    <bean id="userManager" class="com.goblingift.orm.UserManager">
+        <constructor-arg ref="databaseService" />
+    </bean>
+    
+    <bean id="userMapper" class="com.goblingift.orm.UserMapper" />
+    
+</beans>
