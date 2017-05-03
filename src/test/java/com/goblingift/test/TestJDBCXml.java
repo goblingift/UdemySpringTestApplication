@@ -40,6 +40,5 @@ public class TestJDBCXml {
         for (Map<String, Object> actUser : usersByQueryForList) {
             System.out.println("Another user found: " + actUser);
         }
-        
     }
 }
