@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -17,6 +18,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
  *
  * @author andre
  */
+@Transactional
 public class UserManager {
     
     @Autowired
@@ -31,6 +33,14 @@ public class UserManager {
     
     public void readWholeDatabase() {
         jdbcTemplate.query("SELECT * FROM USER", (ResultSet rs) -> System.out.println(rs.getString(2)));
+    }
+    
+    public void printAllUsers() {
+        jdbcTemplate.query("SELECT * FROM USER", new UserRowCallbackHandler());
+    }
+    
+    public List<User> getAllUsers() {
+        return jdbcTemplate.query("SELECT * FROM USER", new UserResultSetExtractor());
     }
     
     public User getUserByQueryForObject(int idUser) {
@@ -49,4 +59,21 @@ public class UserManager {
         return jdbcTemplate.queryForList(sqlQuery);
     }
     
+    public boolean addUser(User user) {
+        String sqlQuery = "INSERT INTO USER (USERNAME,PASSWORD,ACTIVE) VALUES (?,?,?)";
+        int updated = jdbcTemplate.update(sqlQuery, user.getUsername(), user.getPassword(), user.isActive());
+        return updated > 0;
+    }
+    
+    public boolean deleteUserByUsername(String username) {
+        String sqlQuery = "DELETE FROM USER WHERE USERNAME = ?";
+        int updated = jdbcTemplate.update(sqlQuery, username);
+        return updated > 0;
+    }
+    
+    public boolean updateUser(User user) {
+        String sqlQuery = "UPDATE USER SET ACTIVE = ?,PASSWORD = ? WHERE USERNAME = ?";
+        int updated = jdbcTemplate.update(sqlQuery, user.isActive(), user.getPassword(), user.getUsername());
+        return updated > 0;
+    }
 }

@@ -15,6 +15,16 @@ public class User {
     private String username;
     private String password;
     private boolean active;
+
+    public User() {
+    }
+
+    public User(String username, String password, boolean active) {
+        this.username = username;
+        this.password = password;
+        this.active = active;
+    }
+    
     
     
     public int getIdUser() {

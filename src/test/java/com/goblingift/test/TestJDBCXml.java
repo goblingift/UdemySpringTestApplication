@@ -5,7 +5,6 @@
  */
 package com.goblingift.test;
 
-import com.goblingift.bean.UserBean;
 import com.goblingift.orm.User;
 import com.goblingift.orm.UserManager;
 import java.util.List;
@@ -14,7 +13,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /**
@@ -30,15 +28,29 @@ public class TestJDBCXml {
     @Test
     public void doTest() {
         UserManager userManager = context.getBean(UserManager.class);
-        User user = userManager.getUserByQueryForObject(1);
-        System.out.println(user);
         
-        Map<String, Object> userByQueryForMap = userManager.getUserByQueryForMap(1);
-        System.out.println(userByQueryForMap);
+        User peter = new User("Peter", "geheim123", true);
+        userManager.addUser(peter);
+        displayAllUsers();
+        peter.setActive(false);
+        userManager.updateUser(peter);
+        displayAllUsers();
         
+        userManager.printAllUsers();
+        
+        List<User> allUsers = userManager.getAllUsers();
+        for (User actUser : allUsers) {
+            System.out.println("ITS:" + actUser);
+        }
+    }
+    
+    private void displayAllUsers() {
+        UserManager userManager = context.getBean(UserManager.class);
+        System.out.println("This are the users:");
         List<Map<String, Object>> usersByQueryForList = userManager.getUsersByQueryForList();
         for (Map<String, Object> actUser : usersByQueryForList) {
             System.out.println("Another user found: " + actUser);
         }
     }
+    
 }
