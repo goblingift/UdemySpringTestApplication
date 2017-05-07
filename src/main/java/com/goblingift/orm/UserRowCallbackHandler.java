@@ -19,9 +19,9 @@ public class UserRowCallbackHandler implements RowCallbackHandler {
     public void processRow(ResultSet rs) throws SQLException {
         while (rs.next()) {
             System.out.println("IDUSER: " + rs.getString("IDUSER"));
-            System.out.println("USERNAME: " + rs.getString("USERNAME"));
-            System.out.println("PASSWORD: " + rs.getString("PASSWORD"));
-            System.out.println("ACTIVE: " + rs.getString("ACTIVE"));
+//            System.out.println("USERNAME: " + rs.getString("USERNAME"));
+//            System.out.println("PASSWORD: " + rs.getString("PASSWORD"));
+//            System.out.println("ACTIVE: " + rs.getString("ACTIVE"));
         }
     }
 }

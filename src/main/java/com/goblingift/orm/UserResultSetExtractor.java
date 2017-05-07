@@ -5,6 +5,7 @@
  */
 package com.goblingift.orm;
 
+import com.goblingift.orm.entities.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;

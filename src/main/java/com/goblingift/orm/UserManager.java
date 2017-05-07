@@ -5,14 +5,18 @@
  */
 package com.goblingift.orm;
 
+import com.goblingift.orm.entities.User;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import javax.transaction.Transactional;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -24,11 +28,34 @@ public class UserManager {
     @Autowired
     private UserMapper userMapper;
     
+    @PersistenceContext
+    EntityManager entityManager;
+    
     private JdbcTemplate jdbcTemplate;
     
     
     public UserManager(DatabaseService databaseService) {
         this.jdbcTemplate = databaseService.getJdbcTemplate();
+    }
+    
+    public User getUserById(int id) {
+        User foundUser = entityManager.find(User.class, id);
+        return foundUser;
+    }
+    
+    /**
+     * Uses native SQL query to delete user.
+     * @param id
+     * @return true if deleted with success, false if otherwise.
+     */
+    public boolean deleteUserWithNativeQuery(int id) {
+        Query query = entityManager.createNativeQuery("DELETE FROM USER WHERE IDUSER=?");
+        query.setParameter(1, id);
+        return query.executeUpdate() > 0;
+    }
+    
+    public void deleteUser(int id) {
+        entityManager.remove(getUserById(id));
     }
     
     public void readWholeDatabase() {
@@ -39,6 +66,7 @@ public class UserManager {
         jdbcTemplate.query("SELECT * FROM USER", new UserRowCallbackHandler());
     }
     
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<User> getAllUsers() {
         return jdbcTemplate.query("SELECT * FROM USER", new UserResultSetExtractor());
     }
@@ -63,6 +91,11 @@ public class UserManager {
         String sqlQuery = "INSERT INTO USER (USERNAME,PASSWORD,ACTIVE) VALUES (?,?,?)";
         int updated = jdbcTemplate.update(sqlQuery, user.getUsername(), user.getPassword(), user.isActive());
         return updated > 0;
+    }
+    
+    public boolean addUserAndThrowException(User user) {
+        addUser(user);
+        throw new RuntimeException("BAM! EXCEPTION!");
     }
     
     public boolean deleteUserByUsername(String username) {
